@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solo Leveling - Snake & Ladder</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="multiplayer.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <!-- Portal Loading Screen -->
+    <div id="portal-loader" class="portal-loader">
+        <div class="portal-ring"></div>
+        <div class="portal-ring"></div>
+        <div class="portal-ring"></div>
+        <div class="portal-text">ARISE</div>
+    </div>
+
+    <!-- Screen 0: Login -->
+    <div id="screen-login" class="screen active">
+        <div class="screen-bg"></div>
+        <div class="container">
+            <h1 class="game-title">
+                <span class="title-shadow">SOLO LEVELING</span>
+                <span class="title-main">SOLO LEVELING</span>
+            </h1>
+            <h2 class="subtitle">Enter the Arena</h2>
+            
+            <div class="login-box-game">
+                <h3 class="section-title">HUNTER REGISTRATION</h3>
+                <div class="login-form-game">
+                    <input type="text" id="player-name" placeholder="Enter Your Name" class="game-input" maxlength="20">
+                    <input type="text" id="player-username" placeholder="Enter Username" class="game-input" maxlength="15">
+                    <button id="login-btn-game" class="neon-btn">ENTER ARENA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 0.5: Mode Selection -->
+    <div id="screen-mode-select" class="screen">
+        <div class="screen-bg"></div>
+        <div class="container">
+            <h1 class="game-title">
+                <span class="title-shadow">GAME MODE</span>
+                <span class="title-main">GAME MODE</span>
+            </h1>
+            <h2 class="subtitle">Choose Your Battle Style</h2>
+            
+            <div class="mode-select-box">
+                <div class="mode-card" id="single-phone-mode">
+                    <div class="mode-icon">📱</div>
+                    <h3>SINGLE DEVICE</h3>
+                    <p>Play with friends on one phone</p>
+                    <button class="neon-btn mode-btn">PLAY LOCALLY</button>
+                </div>
+                
+                <div class="mode-card" id="multi-phone-mode">
+                    <div class="mode-icon">🌐</div>
+                    <h3>ONLINE MULTIPLAYER</h3>
+                    <p>Play with friends on different devices</p>
+                    <button class="neon-btn mode-btn">PLAY ONLINE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 0.75: Group Selection -->
+    <div id="screen-group-select" class="screen">
+        <div class="screen-bg"></div>
+        <div class="container">
+            <h2 class="screen-header">ONLINE MULTIPLAYER</h2>
+            
+            <div class="group-select-box">
+                <div class="group-option-card" id="create-group-card">
+                    <div class="group-icon">➕</div>
+                    <h3>CREATE GROUP</h3>
+                    <p>Start a new game room</p>
+                    <button class="neon-btn" id="create-group-btn">CREATE NEW GROUP</button>
+                </div>
+                
+                <div class="group-option-card" id="join-group-card">
+                    <div class="group-icon">🚪</div>
+                    <h3>JOIN GROUP</h3>
+                    <p>Join an existing game room</p>
+                    <button class="neon-btn" id="join-group-btn">JOIN EXISTING GROUP</button>
+                </div>
+            </div>
+            
+            <button class="neon-btn back-btn" id="back-to-mode">← BACK</button>
+        </div>
+    </div>
+
+    <!-- Screen: Create Group -->
+    <div id="screen-create-group" class="screen">
+        <div class="screen-bg"></div>
+        <div class="container">
+            <h2 class="screen-header">CREATE GROUP</h2>
+            
+            <div class="create-group-form">
+                <input type="text" id="group-name-input" placeholder="Enter Group Name" class="game-input" maxlength="30">
+                
+                <div class="invite-section">
+                    <h3 class="section-title">INVITE HUNTERS</h3>
+                    <div id="invite-inputs">
+                        <div class="invite-input-row">
+                            <input type="text" placeholder="Enter username to invite" class="game-input invite-username">
+                            <button class="neon-btn small add-invite-btn">+</button>
+                        </div>
+                    </div>
+                    <div id="invited-list" class="invited-list"></div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="neon-btn" id="create-group-submit">CREATE & START</button>
+                    <button class="neon-btn danger" id="cancel-create-group">CANCEL</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Join Group -->
+    <div id="screen-join-group" class="screen">
+        <div class="screen-bg"></div>
+        <div class="container">
+            <h2 class="screen-header">AVAILABLE GROUPS</h2>
+            
+            <div class="search-bar">
+                <input type="text" id="search-groups" placeholder="Search groups..." class="game-input">
+            </div>
+            
+            <div id="groups-list" class="groups-list">
+                <!-- Groups populated dynamically -->
+            </div>
+            
+            <button class="neon-btn back-btn" id="back-to-group-select">← BACK</button>
+        </div>
+    </div>
+
+    <!-- Screen: Lobby (Waiting Room) -->
+    <div id="screen-lobby" class="screen">
+        <div class="screen-bg"></div>
+        <div class="container">
+            <h2 class="screen-header" id="lobby-group-name">GROUP NAME</h2>
+            
+            <div class="lobby-container">
+                <div class="lobby-left">
+                    <h3 class="section-title">HUNTERS IN LOBBY</h3>
+                    <div id="lobby-players" class="lobby-players">
+                        <!-- Players populated dynamically -->
+                    </div>
+                    
+                    <div class="lobby-info">
+                        <p>Group Code: <span id="group-code" class="highlight">XXXX</span></p>
+                        <p>Players: <span id="player-count">0</span>/4</p>
+                    </div>
+                    
+                    <div class="lobby-actions">
+                        <button class="neon-btn" id="start-online-game" style="display:none;">START GAME</button>
+                        <button class="neon-btn danger" id="leave-lobby">LEAVE GROUP</button>
+                    </div>
+                </div>
+                
+                <div class="lobby-right">
+                    <h3 class="section-title">GROUP CHAT</h3>
+                    <div id="chat-messages" class="chat-messages">
+                        <!-- Messages populated dynamically -->
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chat-input" placeholder="Type a message..." class="game-input">
+                        <button class="neon-btn small" id="send-chat">SEND</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 1: Player Selection -->
+    <div id="screen-player-select" class="screen">
+        <div class="screen-bg"></div>
+        <div class="container">
+            <h1 class="game-title">
+                <span class="title-shadow">SOLO LEVELING</span>
+                <span class="title-main">SOLO LEVELING</span>
+            </h1>
+            <h2 class="subtitle">Snake & Ladder Arena</h2>
+            
+            <div class="player-select-box">
+                <h3 class="section-title">SELECT NUMBER OF HUNTERS</h3>
+                <div class="player-buttons">
+                    <button class="neon-btn player-count-btn" data-count="2">2 PLAYERS</button>
+                    <button class="neon-btn player-count-btn" data-count="3">3 PLAYERS</button>
+                    <button class="neon-btn player-count-btn" data-count="4">4 PLAYERS</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 2: Class Selection -->
+    <div id="screen-class-select" class="screen">
+        <div class="screen-bg"></div>
+        <div class="container">
+            <h2 class="screen-header">CHOOSE YOUR CLASS LEVEL</h2>
+            <div id="class-selection-container" class="class-selection-container">
+                <!-- Dynamically populated -->
+            </div>
+            <button id="start-game-btn" class="neon-btn start-btn" style="display:none;">START BATTLE</button>
+        </div>
+    </div>
+
+    <!-- Screen 3: Game Board -->
+    <div id="screen-game" class="screen">
+        <div class="screen-bg game-bg"></div>
+        
+        <!-- Game Header -->
+        <div class="game-header">
+            <div class="game-logo">SOLO LEVELING</div>
+            <div id="current-turn" class="current-turn">PLAYER 1's TURN</div>
+            <div class="game-stats">
+                <span id="round-counter">ROUND: 1</span>
+            </div>
+        </div>
+
+        <!-- Player Info Panel -->
+        <div id="players-panel" class="players-panel">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- Game Board -->
+        <div class="game-board-container">
+            <canvas id="game-board" width="800" height="800"></canvas>
+            <div id="tokens-container" class="tokens-container"></div>
+        </div>
+
+        <!-- Dice Container -->
+        <div class="dice-container">
+            <div id="dice" class="dice">
+                <div class="dice-face">?</div>
+            </div>
+            <button id="roll-dice-btn" class="neon-btn roll-btn">ROLL DICE</button>
+        </div>
+
+        <!-- Online Chat Panel (for multiplayer) -->
+        <div id="game-chat-panel" class="game-chat-panel" style="display:none;">
+            <div class="chat-header">
+                <span>GROUP CHAT</span>
+                <button id="toggle-chat" class="chat-toggle">−</button>
+            </div>
+            <div class="chat-body">
+                <div id="game-chat-messages" class="game-chat-messages"></div>
+                <div class="chat-input-container">
+                    <input type="text" id="game-chat-input" placeholder="Message..." class="game-input small">
+                    <button class="neon-btn tiny" id="game-send-chat">➤</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Modal -->
+        <div id="question-modal" class="modal">
+            <div class="modal-content question-box">
+                <div class="question-header">
+                    <span class="question-class">CLASS <span id="q-class">6</span></span>
+                    <span class="question-timer" id="timer">30</span>
+                </div>
+                <h3 id="question-text" class="question-text">Question appears here...</h3>
+                <div id="options-container" class="options-container">
+                    <!-- Options populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Modal -->
+        <div id="result-modal" class="modal">
+            <div class="modal-content result-box">
+                <div id="result-content"></div>
+            </div>
+        </div>
+
+        <!-- Winner Modal -->
+        <div id="winner-modal" class="modal">
+            <div class="modal-content winner-box">
+                <h1 class="winner-title">VICTORY!</h1>
+                <div id="winner-content"></div>
+                <button id="play-again-btn" class="neon-btn">PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Particle Effects Container -->
+    <div id="particles-container"></div>
+
+    <!-- Audio Elements -->
+    <audio id="bg-music" loop>
+        <source src="assets/bg-music.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="dice-sound">
+        <source src="assets/dice.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correct-sound">
+        <source src="assets/correct.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="wrong-sound">
+        <source src="assets/wrong.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="win-sound">
+        <source src="assets/win.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="multiplayer.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Solo Leveling Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <!-- Login Screen -->
+    <div id="login-screen" class="admin-login">
+        <div class="screen-bg"></div>
+        <div class="login-box">
+            <h1 class="admin-title">ADMIN PORTAL</h1>
+            <div class="login-form">
+                <input type="password" id="admin-password" placeholder="Enter Admin Password" class="admin-input">
+                <button id="login-btn" class="neon-btn">ACCESS SYSTEM</button>
+                <p class="hint">Default: admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="admin-dashboard" style="display:none;">
+        <div class="admin-header">
+            <h1>SOLO LEVELING - ADMIN PANEL</h1>
+            <div class="admin-stats">
+                <span id="total-questions">Total Questions: 0</span>
+                <button id="logout-btn" class="neon-btn small">LOGOUT</button>
+            </div>
+        </div>
+
+        <div class="admin-container">
+            <!-- Sidebar -->
+            <div class="admin-sidebar">
+                <button class="admin-nav-btn active" data-tab="import">📥 IMPORT</button>
+                <button class="admin-nav-btn" data-tab="manage">📝 MANAGE</button>
+                <button class="admin-nav-btn" data-tab="add">➕ ADD NEW</button>
+                <button class="admin-nav-btn" data-tab="export">📤 EXPORT</button>
+            </div>
+
+            <!-- Main Content -->
+            <div class="admin-content">
+                <!-- Import Tab -->
+                <div id="tab-import" class="admin-tab active">
+                    <h2>IMPORT QUESTIONS</h2>
+                    
+                    <div class="import-section">
+                        <h3>Upload File</h3>
+                        <div class="file-upload-area">
+                            <input type="file" id="file-input" accept=".json,.csv,.txt,.pdf" class="file-input">
+                            <label for="file-input" class="file-label">
+                                <span class="upload-icon">📁</span>
+                                <span>Choose File (JSON, CSV, TXT, PDF)</span>
+                            </label>
+                            <div id="file-name" class="file-name"></div>
+                        </div>
+                        <button id="import-btn" class="neon-btn" disabled>IMPORT QUESTIONS</button>
+                    </div>
+
+                    <div class="import-section">
+                        <h3>Bulk JSON Import</h3>
+                        <textarea id="json-input" class="json-textarea" placeholder='[{"class":"6","question":"...","options":["A","B","C","D"],"answer":"A"}]'></textarea>
+                        <button id="import-json-btn" class="neon-btn">IMPORT JSON</button>
+                    </div>
+
+                    <div id="import-status" class="import-status"></div>
+                </div>
+
+                <!-- Manage Tab -->
+                <div id="tab-manage" class="admin-tab">
+                    <h2>MANAGE QUESTIONS</h2>
+                    
+                    <div class="filter-bar">
+                        <select id="filter-class" class="admin-select">
+                            <option value="">All Classes</option>
+                            <option value="6">Class 6</option>
+                            <option value="7">Class 7</option>
+                            <option value="8">Class 8</option>
+                            <option value="9">Class 9</option>
+                            <option value="10">Class 10</option>
+                        </select>
+                        <input type="text" id="search-question" placeholder="Search questions..." class="admin-input">
+                        <button id="search-btn" class="neon-btn small">SEARCH</button>
+                        <button id="clear-all-btn" class="neon-btn small danger">CLEAR ALL</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="questions-table" class="questions-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Class</th>
+                                    <th>Question</th>
+                                    <th>Answer</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="questions-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+                        <button id="prev-page" class="neon-btn small">PREV</button>
+                        <span id="page-info">Page 1</span>
+                        <button id="next-page" class="neon-btn small">NEXT</button>
+                    </div>
+                </div>
+
+                <!-- Add New Tab -->
+                <div id="tab-add" class="admin-tab">
+                    <h2>ADD NEW QUESTION</h2>
+                    
+                    <div class="add-form">
+                        <div class="form-group">
+                            <label>Class Level</label>
+                            <select id="new-class" class="admin-select">
+                                <option value="6">Class 6</option>
+                                <option value="7">Class 7</option>
+                                <option value="8">Class 8</option>
+                                <option value="9">Class 9</option>
+                                <option value="10">Class 10</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Question</label>
+                            <textarea id="new-question" class="admin-textarea" placeholder="Enter question..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Options</label>
+                            <input type="text" id="new-option-1" class="admin-input" placeholder="Option A">
+                            <input type="text" id="new-option-2" class="admin-input" placeholder="Option B">
+                            <input type="text" id="new-option-3" class="admin-input" placeholder="Option C">
+                            <input type="text" id="new-option-4" class="admin-input" placeholder="Option D">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correct Answer</label>
+                            <select id="new-answer" class="admin-select">
+                                <option value="">Select Correct Option</option>
+                                <option value="0">Option A</option>
+                                <option value="1">Option B</option>
+                                <option value="2">Option C</option>
+                                <option value="3">Option D</option>
+                            </select>
+                        </div>
+
+                        <button id="add-question-btn" class="neon-btn">ADD QUESTION</button>
+                    </div>
+                </div>
+
+                <!-- Export Tab -->
+                <div id="tab-export" class="admin-tab">
+                    <h2>EXPORT DATABASE</h2>
+                    
+                    <div class="export-section">
+                        <h3>Export All Questions</h3>
+                        <p>Download the entire question database</p>
+                        <button id="export-json-btn" class="neon-btn">EXPORT AS JSON</button>
+                        <button id="export-csv-btn" class="neon-btn">EXPORT AS CSV</button>
+                        <button id="export-txt-btn" class="neon-btn">EXPORT AS TXT</button>
+                    </div>
+
+                    <div class="export-section">
+                        <h3>Export by Class</h3>
+                        <select id="export-class" class="admin-select">
+                            <option value="">Select Class</option>
+                            <option value="6">Class 6</option>
+                            <option value="7">Class 7</option>
+                            <option value="8">Class 8</option>
+                            <option value="9">Class 9</option>
+                            <option value="10">Class 10</option>
+                        </select>
+                        <button id="export-class-btn" class="neon-btn">EXPORT SELECTED CLASS</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content edit-box">
+            <h2>EDIT QUESTION</h2>
+            <div class="edit-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="edit-class" class="admin-select">
+                        <option value="6">Class 6</option>
+                        <option value="7">Class 7</option>
+                        <option value="8">Class 8</option>
+                        <option value="9">Class 9</option>
+                        <option value="10">Class 10</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Question</label>
+                    <textarea id="edit-question" class="admin-textarea"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Options</label>
+                    <input type="text" id="edit-option-1" class="admin-input">
+                    <input type="text" id="edit-option-2" class="admin-input">
+                    <input type="text" id="edit-option-3" class="admin-input">
+                    <input type="text" id="edit-option-4" class="admin-input">
+                </div>
+                <div class="form-group">
+                    <label>Correct Answer</label>
+                    <select id="edit-answer" class="admin-select">
+                        <option value="0">Option A</option>
+                        <option value="1">Option B</option>
+                        <option value="2">Option C</option>
+                        <option value="3">Option D</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button id="save-edit-btn" class="neon-btn">SAVE</button>
+                    <button id="cancel-edit-btn" class="neon-btn danger">CANCEL</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

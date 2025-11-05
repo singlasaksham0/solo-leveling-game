@@ -1,0 +1,598 @@
+/* ===================================
+   SOLO LEVELING - ANIMATIONS & EFFECTS
+   =================================== */
+
+/* ===================================
+   PORTAL LOADER
+   =================================== */
+
+.portal-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #1a1f3a 0%, #000000 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+.portal-loader.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.portal-ring {
+    position: absolute;
+    border: 3px solid transparent;
+    border-top-color: var(--primary-blue);
+    border-radius: 50%;
+    animation: portalSpin 2s linear infinite;
+}
+
+.portal-ring:nth-child(1) {
+    width: 150px;
+    height: 150px;
+    border-top-color: var(--primary-blue);
+    animation-duration: 1.5s;
+}
+
+.portal-ring:nth-child(2) {
+    width: 200px;
+    height: 200px;
+    border-top-color: var(--primary-purple);
+    animation-duration: 2s;
+    animation-direction: reverse;
+}
+
+.portal-ring:nth-child(3) {
+    width: 250px;
+    height: 250px;
+    border-top-color: var(--success-green);
+    animation-duration: 2.5s;
+}
+
+@keyframes portalSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.portal-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--primary-blue);
+    text-shadow: 0 0 30px var(--shadow-color);
+    animation: portalTextPulse 1.5s ease-in-out infinite;
+    z-index: 10;
+}
+
+@keyframes portalTextPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 0.8;
+        text-shadow: 0 0 30px var(--shadow-color);
+    }
+    50% { 
+        transform: scale(1.2); 
+        opacity: 1;
+        text-shadow: 0 0 50px var(--shadow-color), 0 0 80px var(--shadow-color);
+    }
+}
+
+/* ===================================
+   PARTICLE EFFECTS
+   =================================== */
+
+#particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9998;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--primary-blue);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--primary-blue);
+    animation: particleFloat 3s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(50px);
+        opacity: 0;
+    }
+}
+
+/* Shadow Army Burst Effect */
+.shadow-burst {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.8) 0%, transparent 70%);
+    animation: shadowBurst 0.8s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes shadowBurst {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+/* Beru Drag Effect */
+.beru-drag {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">👹</text></svg>');
+    background-size: contain;
+    animation: beruDrag 2s ease-in-out forwards;
+    pointer-events: none;
+    z-index: 1001;
+}
+
+@keyframes beruDrag {
+    0% {
+        transform: translateX(0) translateY(0) scale(0);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+        transform: translateX(0) translateY(0) scale(1);
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(0) translateY(100vh) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* XP Level Up Effect */
+.xp-popup {
+    position: absolute;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--success-green);
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+    animation: xpFloat 2s ease-out forwards;
+    pointer-events: none;
+    z-index: 1002;
+}
+
+@keyframes xpFloat {
+    0% {
+        transform: translateY(0) scale(0);
+        opacity: 0;
+    }
+    20% {
+        transform: translateY(-20px) scale(1.2);
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-150px) scale(0.8);
+        opacity: 0;
+    }
+}
+
+/* Wrong Answer Flame Effect */
+.flame-text {
+    position: absolute;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--danger-red);
+    text-shadow: 0 0 30px rgba(255, 51, 102, 1);
+    animation: flameShake 0.5s ease-in-out 3;
+    pointer-events: none;
+    z-index: 1002;
+}
+
+@keyframes flameShake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(-10px) rotate(-5deg); }
+    75% { transform: translateX(10px) rotate(5deg); }
+}
+
+/* Screen Shake Effect */
+@keyframes screenShake {
+    0%, 100% { transform: translate(0, 0); }
+    10%, 30%, 50%, 70%, 90% { transform: translate(-5px, 5px); }
+    20%, 40%, 60%, 80% { transform: translate(5px, -5px); }
+}
+
+.shake {
+    animation: screenShake 0.5s ease-in-out;
+}
+
+/* Dice Roll Blur Effect */
+@keyframes diceBlur {
+    0%, 100% { filter: blur(0px); }
+    50% { filter: blur(5px); }
+}
+
+.dice-blur {
+    animation: diceBlur 0.5s ease-in-out;
+}
+
+/* Token Movement Trail */
+.token-trail {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.5;
+    animation: trailFade 0.5s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes trailFade {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* Aura Glow Animation */
+.aura-glow {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.6) 0%, transparent 70%);
+    animation: auraExpand 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes auraExpand {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.3;
+    }
+}
+
+/* Snake/Ladder Animation */
+.snake-ladder-effect {
+    position: absolute;
+    font-size: 4rem;
+    animation: snakeLadderMove 1s ease-in-out forwards;
+    pointer-events: none;
+    z-index: 1001;
+}
+
+@keyframes snakeLadderMove {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.5) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Button Click Ripple */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(0, 212, 255, 0.5);
+    transform: scale(0);
+    animation: rippleEffect 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes rippleEffect {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Glow Pulse for Active Elements */
+.glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 0 0 20px var(--shadow-color);
+    }
+    50% {
+        box-shadow: 0 0 40px var(--shadow-color), 0 0 60px var(--shadow-color);
+    }
+}
+
+/* Floating Animation for UI Elements */
+.float {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Slide In Animations */
+.slide-in-left {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.slide-in-top {
+    animation: slideInTop 0.5s ease-out;
+}
+
+@keyframes slideInTop {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.slide-in-bottom {
+    animation: slideInBottom 0.5s ease-out;
+}
+
+@keyframes slideInBottom {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Fade Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s ease-out;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Zoom Animations */
+.zoom-in {
+    animation: zoomIn 0.5s ease-out;
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.zoom-out {
+    animation: zoomOut 0.5s ease-out;
+}
+
+@keyframes zoomOut {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+/* Rotate Animations */
+.rotate-in {
+    animation: rotateIn 0.5s ease-out;
+}
+
+@keyframes rotateIn {
+    from {
+        transform: rotate(-360deg) scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: rotate(0deg) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Bounce Animation */
+.bounce {
+    animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Neon Border Animation */
+.neon-border {
+    position: relative;
+    overflow: hidden;
+}
+
+.neon-border::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        transparent,
+        var(--primary-blue),
+        transparent 30%
+    );
+    animation: rotateBorder 4s linear infinite;
+}
+
+.neon-border::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: var(--dark-bg);
+    border-radius: inherit;
+}
+
+@keyframes rotateBorder {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Lightning Effect */
+.lightning {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--primary-blue), transparent);
+    animation: lightning 0.2s ease-in-out;
+    pointer-events: none;
+}
+
+@keyframes lightning {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+/* Energy Wave */
+.energy-wave {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--primary-blue);
+    border-radius: 50%;
+    animation: energyWave 1.5s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes energyWave {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Glitch Effect */
+.glitch {
+    animation: glitch 0.3s ease-in-out;
+}
+
+@keyframes glitch {
+    0%, 100% {
+        transform: translate(0);
+    }
+    20% {
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        transform: translate(-2px, -2px);
+    }
+    60% {
+        transform: translate(2px, 2px);
+    }
+    80% {
+        transform: translate(2px, -2px);
+    }
+}
