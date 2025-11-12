@@ -1,6 +1,43 @@
 /* ===================================
-   SOLO LEVELING - ANIMATIONS & EFFECTS
+   SOLO LEVELING - ANIMATIONS & EFFECTS (IMPROVED)
+   - centralized timing vars
+   - prefers-reduced-motion support
+   - GPU-accelerated transforms and will-change hints
+   - reduced use of expensive properties (filter) where possible
    =================================== */
+
+:root{
+    /* centralized timing and easing */
+    --anim-very-fast: 0.25s;
+    --anim-fast: 0.5s;
+    --anim-mid: 1.25s;
+    --anim-slow: 2s;
+    --anim-long: 3s;
+    --ease-default: cubic-bezier(.4,0,.2,1);
+    --ease-snappy: cubic-bezier(.25,.8,.25,1);
+    --shadow-color: rgba(0, 212, 255, 0.85);
+    --primary-blue: #2bb7ff;
+    --primary-purple: #8b5cf6;
+    --success-green: #00ff88;
+    --danger-red: #ff3366;
+    --dark-bg: #0b0d14;
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+    .portal-loader { opacity: 1 !important; pointer-events: none; }
+}
+
+/* Helper to trigger GPU acceleration in browsers */
+.gpu {
+    transform: translate3d(0,0,0);
+    backface-visibility: hidden;
+}
 
 /* ===================================
    PORTAL LOADER
@@ -8,21 +45,19 @@
 
 .portal-loader {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: radial-gradient(circle, #1a1f3a 0%, #000000 100%);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.4s var(--ease-default);
+    pointer-events: none;
 }
 
 .portal-loader.hidden {
     opacity: 0;
-    pointer-events: none;
+    visibility: hidden;
 }
 
 .portal-ring {
@@ -30,69 +65,70 @@
     border: 3px solid transparent;
     border-top-color: var(--primary-blue);
     border-radius: 50%;
-    animation: portalSpin 2s linear infinite;
+    will-change: transform;
+    transform-origin: 50% 50%;
+    /* ensure GPU usage */
+    transform: translate3d(0,0,0) rotate(0deg);
 }
 
 .portal-ring:nth-child(1) {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
     border-top-color: var(--primary-blue);
-    animation-duration: 1.5s;
+    animation: portalSpin var(--anim-mid) linear infinite;
 }
-
 .portal-ring:nth-child(2) {
-    width: 200px;
-    height: 200px;
+    width: 190px;
+    height: 190px;
     border-top-color: var(--primary-purple);
-    animation-duration: 2s;
-    animation-direction: reverse;
+    animation: portalSpin var(--anim-slow) linear infinite reverse;
 }
-
 .portal-ring:nth-child(3) {
-    width: 250px;
-    height: 250px;
+    width: 240px;
+    height: 240px;
     border-top-color: var(--success-green);
-    animation-duration: 2.5s;
+    animation: portalSpin var(--anim-long) linear infinite;
 }
 
 @keyframes portalSpin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    from { transform: translate3d(0,0,0) rotate(0deg); }
+    to   { transform: translate3d(0,0,0) rotate(360deg); }
 }
 
 .portal-text {
     font-family: 'Orbitron', sans-serif;
-    font-size: 3rem;
+    font-size: 2.75rem;
     font-weight: 900;
     color: var(--primary-blue);
-    text-shadow: 0 0 30px var(--shadow-color);
-    animation: portalTextPulse 1.5s ease-in-out infinite;
+    text-shadow: 0 0 24px var(--shadow-color);
+    animation: portalTextPulse var(--anim-slow) var(--ease-snappy) infinite;
     z-index: 10;
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
 }
 
 @keyframes portalTextPulse {
-    0%, 100% { 
-        transform: scale(1); 
-        opacity: 0.8;
-        text-shadow: 0 0 30px var(--shadow-color);
+    0%, 100% {
+        transform: translate3d(0,0,0) scale(1);
+        opacity: 0.9;
+        text-shadow: 0 0 24px var(--shadow-color);
     }
-    50% { 
-        transform: scale(1.2); 
+    50% {
+        transform: translate3d(0,0,0) scale(1.18);
         opacity: 1;
-        text-shadow: 0 0 50px var(--shadow-color), 0 0 80px var(--shadow-color);
+        text-shadow: 0 0 44px var(--shadow-color), 0 0 70px var(--shadow-color);
     }
 }
 
 /* ===================================
-   PARTICLE EFFECTS
+   PARTICLE EFFECTS (optimized)
+   - use translate3d for GPU acceleration
+   - provide will-change and smaller default particle size
    =================================== */
 
 #particles-container {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     pointer-events: none;
     z-index: 9998;
     overflow: hidden;
@@ -104,23 +140,28 @@
     height: 4px;
     background: var(--primary-blue);
     border-radius: 50%;
-    box-shadow: 0 0 10px var(--primary-blue);
-    animation: particleFloat 3s ease-in-out infinite;
+    box-shadow: 0 0 8px var(--primary-blue);
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
+    animation: particleFloat var(--anim-long) linear infinite;
+    opacity: 0;
 }
 
+/* Use transforms (GPU) and fade in/out */
 @keyframes particleFloat {
     0% {
-        transform: translateY(0) translateX(0);
+        transform: translate3d(0, 0, 0) scale(0.9);
         opacity: 0;
     }
-    10% {
+    8% {
         opacity: 1;
+        transform: translate3d(var(--particle-x, 0px), var(--particle-y, -8vh), 0) scale(1);
     }
-    90% {
+    80% {
         opacity: 1;
     }
     100% {
-        transform: translateY(-100vh) translateX(50px);
+        transform: translate3d(calc(var(--particle-x, 0px) + 40px), -100vh, 0) scale(0.8);
         opacity: 0;
     }
 }
@@ -128,21 +169,23 @@
 /* Shadow Army Burst Effect */
 .shadow-burst {
     position: absolute;
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(139, 92, 246, 0.8) 0%, transparent 70%);
-    animation: shadowBurst 0.8s ease-out forwards;
+    animation: shadowBurst 0.72s var(--ease-snappy) forwards;
     pointer-events: none;
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
 }
 
 @keyframes shadowBurst {
     0% {
-        transform: scale(0);
-        opacity: 1;
+        transform: translate3d(0,0,0) scale(0.4);
+        opacity: 0.95;
     }
     100% {
-        transform: scale(3);
+        transform: translate3d(0,0,0) scale(2.6);
         opacity: 0;
     }
 }
@@ -150,29 +193,30 @@
 /* Beru Drag Effect */
 .beru-drag {
     position: absolute;
-    width: 100px;
-    height: 100px;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">👹</text></svg>');
-    background-size: contain;
-    animation: beruDrag 2s ease-in-out forwards;
+    width: 96px;
+    height: 96px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">👹</text></svg>') center/contain no-repeat;
+    animation: beruDrag var(--anim-slow) var(--ease-default) forwards;
     pointer-events: none;
     z-index: 1001;
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
 }
 
 @keyframes beruDrag {
     0% {
-        transform: translateX(0) translateY(0) scale(0);
+        transform: translate3d(0, 0, 0) scale(0);
         opacity: 0;
     }
-    20% {
+    18% {
         opacity: 1;
-        transform: translateX(0) translateY(0) scale(1);
+        transform: translate3d(0, 0, 0) scale(1);
     }
     80% {
         opacity: 1;
     }
     100% {
-        transform: translateX(0) translateY(100vh) scale(0.5);
+        transform: translate3d(0, 100vh, 0) scale(0.55);
         opacity: 0;
     }
 }
@@ -181,29 +225,31 @@
 .xp-popup {
     position: absolute;
     font-family: 'Orbitron', sans-serif;
-    font-size: 2rem;
+    font-size: 1.9rem;
     font-weight: 900;
     color: var(--success-green);
-    text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
-    animation: xpFloat 2s ease-out forwards;
+    text-shadow: 0 0 16px rgba(0, 255, 136, 0.8);
+    animation: xpFloat var(--anim-slow) var(--ease-snappy) forwards;
     pointer-events: none;
     z-index: 1002;
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
 }
 
 @keyframes xpFloat {
     0% {
-        transform: translateY(0) scale(0);
+        transform: translate3d(0,0,0) scale(0.92);
         opacity: 0;
     }
     20% {
-        transform: translateY(-20px) scale(1.2);
+        transform: translate3d(0,-20px,0) scale(1.12);
         opacity: 1;
     }
     80% {
         opacity: 1;
     }
     100% {
-        transform: translateY(-150px) scale(0.8);
+        transform: translate3d(0,-140px,0) scale(0.88);
         opacity: 0;
     }
 }
@@ -215,58 +261,63 @@
     font-size: 3rem;
     font-weight: 900;
     color: var(--danger-red);
-    text-shadow: 0 0 30px rgba(255, 51, 102, 1);
-    animation: flameShake 0.5s ease-in-out 3;
+    text-shadow: 0 0 28px rgba(255, 51, 102, 1);
+    animation: flameShake var(--anim-very-fast) ease-in-out 3;
     pointer-events: none;
     z-index: 1002;
+    will-change: transform;
 }
 
 @keyframes flameShake {
-    0%, 100% { transform: translateX(0) rotate(0deg); }
-    25% { transform: translateX(-10px) rotate(-5deg); }
-    75% { transform: translateX(10px) rotate(5deg); }
+    0%, 100% { transform: translate3d(0,0,0) rotate(0deg); }
+    25% { transform: translate3d(-8px, 0, 0) rotate(-4deg); }
+    75% { transform: translate3d(8px, 0, 0) rotate(4deg); }
 }
 
-/* Screen Shake Effect */
+/* Screen Shake Effect (short, GPU optimized) */
 @keyframes screenShake {
-    0%, 100% { transform: translate(0, 0); }
-    10%, 30%, 50%, 70%, 90% { transform: translate(-5px, 5px); }
-    20%, 40%, 60%, 80% { transform: translate(5px, -5px); }
+    0%, 100% { transform: translate3d(0,0,0); }
+    10%, 30%, 50%, 70%, 90% { transform: translate3d(-4px, 4px, 0); }
+    20%, 40%, 60%, 80% { transform: translate3d(4px, -4px, 0); }
 }
-
 .shake {
-    animation: screenShake 0.5s ease-in-out;
+    animation: screenShake var(--anim-fast) var(--ease-default);
+    will-change: transform;
 }
 
-/* Dice Roll Blur Effect */
+/* Dice Roll Blur Effect
+   - filter: blur is expensive. keep short and provide fallback for reduced motion
+*/
 @keyframes diceBlur {
-    0%, 100% { filter: blur(0px); }
-    50% { filter: blur(5px); }
+    0%, 100% { filter: blur(0px); transform: translate3d(0,0,0); }
+    50% { filter: blur(3px); transform: translate3d(0,-1px,0); }
 }
-
 .dice-blur {
-    animation: diceBlur 0.5s ease-in-out;
+    animation: diceBlur var(--anim-fast) var(--ease-default);
+    will-change: filter, transform;
 }
 
 /* Token Movement Trail */
 .token-trail {
     position: absolute;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: inherit;
-    opacity: 0.5;
-    animation: trailFade 0.5s ease-out forwards;
+    opacity: 0.45;
+    animation: trailFade var(--anim-fast) var(--ease-default) forwards;
     pointer-events: none;
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
 }
 
 @keyframes trailFade {
     0% {
-        transform: scale(1);
-        opacity: 0.5;
+        transform: translate3d(0,0,0) scale(1);
+        opacity: 0.45;
     }
     100% {
-        transform: scale(0.5);
+        transform: translate3d(0,0,0) scale(0.45);
         opacity: 0;
     }
 }
@@ -274,45 +325,49 @@
 /* Aura Glow Animation */
 .aura-glow {
     position: absolute;
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(0, 212, 255, 0.6) 0%, transparent 70%);
-    animation: auraExpand 2s ease-in-out infinite;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.55) 0%, transparent 70%);
+    animation: auraExpand var(--anim-long) var(--ease-default) infinite;
     pointer-events: none;
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
 }
 
 @keyframes auraExpand {
     0%, 100% {
-        transform: scale(1);
+        transform: translate3d(0,0,0) scale(1);
         opacity: 0.6;
     }
     50% {
-        transform: scale(1.5);
-        opacity: 0.3;
+        transform: translate3d(0,0,0) scale(1.4);
+        opacity: 0.32;
     }
 }
 
 /* Snake/Ladder Animation */
 .snake-ladder-effect {
     position: absolute;
-    font-size: 4rem;
-    animation: snakeLadderMove 1s ease-in-out forwards;
+    font-size: 3.6rem;
+    animation: snakeLadderMove var(--anim-mid) var(--ease-snappy) forwards;
     pointer-events: none;
     z-index: 1001;
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
 }
 
 @keyframes snakeLadderMove {
     0% {
-        transform: scale(0) rotate(0deg);
+        transform: translate3d(0,0,0) scale(0) rotate(0deg);
         opacity: 0;
     }
     50% {
-        transform: scale(1.5) rotate(180deg);
+        transform: translate3d(0,0,0) scale(1.36) rotate(180deg);
         opacity: 1;
     }
     100% {
-        transform: scale(1) rotate(360deg);
+        transform: translate3d(0,0,0) scale(1) rotate(360deg);
         opacity: 0;
     }
 }
@@ -321,194 +376,103 @@
 .ripple {
     position: absolute;
     border-radius: 50%;
-    background: rgba(0, 212, 255, 0.5);
-    transform: scale(0);
-    animation: rippleEffect 0.6s ease-out;
+    background: rgba(0, 212, 255, 0.48);
+    transform: scale(0) translate3d(0,0,0);
+    animation: rippleEffect var(--anim-fast) var(--ease-default);
     pointer-events: none;
+    will-change: transform, opacity;
 }
-
 @keyframes rippleEffect {
     to {
-        transform: scale(4);
+        transform: scale(3.8);
         opacity: 0;
     }
 }
 
 /* Glow Pulse for Active Elements */
 .glow-pulse {
-    animation: glowPulse 2s ease-in-out infinite;
+    animation: glowPulse var(--anim-long) var(--ease-default) infinite;
+    will-change: box-shadow;
 }
-
 @keyframes glowPulse {
     0%, 100% {
-        box-shadow: 0 0 20px var(--shadow-color);
+        box-shadow: 0 0 14px var(--shadow-color);
     }
     50% {
-        box-shadow: 0 0 40px var(--shadow-color), 0 0 60px var(--shadow-color);
+        box-shadow: 0 0 28px var(--shadow-color), 0 0 46px var(--shadow-color);
     }
 }
 
 /* Floating Animation for UI Elements */
 .float {
-    animation: float 3s ease-in-out infinite;
+    animation: float var(--anim-long) var(--ease-default) infinite;
+    will-change: transform;
 }
-
 @keyframes float {
     0%, 100% {
-        transform: translateY(0);
+        transform: translate3d(0,0,0);
     }
     50% {
-        transform: translateY(-10px);
+        transform: translate3d(0,-8px,0);
     }
 }
 
-/* Slide In Animations */
-.slide-in-left {
-    animation: slideInLeft 0.5s ease-out;
-}
-
+/* Slide In Animations (transform-only) */
+.slide-in-left { animation: slideInLeft var(--anim-fast) var(--ease-default); will-change: transform, opacity; }
 @keyframes slideInLeft {
-    from {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+    from { transform: translate3d(-100%,0,0); opacity: 0; }
+    to   { transform: translate3d(0,0,0); opacity: 1; }
 }
-
-.slide-in-right {
-    animation: slideInRight 0.5s ease-out;
-}
-
+.slide-in-right { animation: slideInRight var(--anim-fast) var(--ease-default); will-change: transform, opacity; }
 @keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+    from { transform: translate3d(100%,0,0); opacity: 0; }
+    to   { transform: translate3d(0,0,0); opacity: 1; }
 }
-
-.slide-in-top {
-    animation: slideInTop 0.5s ease-out;
-}
-
+.slide-in-top { animation: slideInTop var(--anim-fast) var(--ease-default); will-change: transform, opacity; }
 @keyframes slideInTop {
-    from {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translate3d(0,-100%,0); opacity: 0; }
+    to   { transform: translate3d(0,0,0); opacity: 1; }
 }
-
-.slide-in-bottom {
-    animation: slideInBottom 0.5s ease-out;
-}
-
+.slide-in-bottom { animation: slideInBottom var(--anim-fast) var(--ease-default); will-change: transform, opacity; }
 @keyframes slideInBottom {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translate3d(0,100%,0); opacity: 0; }
+    to   { transform: translate3d(0,0,0); opacity: 1; }
 }
 
 /* Fade Animations */
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.fade-out {
-    animation: fadeOut 0.5s ease-out;
-}
-
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
+.fade-in { animation: fadeIn var(--anim-fast) var(--ease-default); will-change: opacity; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.fade-out { animation: fadeOut var(--anim-fast) var(--ease-default); will-change: opacity; }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
 /* Zoom Animations */
-.zoom-in {
-    animation: zoomIn 0.5s ease-out;
-}
-
+.zoom-in { animation: zoomIn var(--anim-fast) var(--ease-default); will-change: transform, opacity; }
 @keyframes zoomIn {
-    from {
-        transform: scale(0);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+    from { transform: translate3d(0,0,0) scale(0.96); opacity: 0; }
+    to   { transform: translate3d(0,0,0) scale(1); opacity: 1; }
 }
-
-.zoom-out {
-    animation: zoomOut 0.5s ease-out;
-}
-
+.zoom-out { animation: zoomOut var(--anim-fast) var(--ease-default); will-change: transform, opacity; }
 @keyframes zoomOut {
-    from {
-        transform: scale(1);
-        opacity: 1;
-    }
-    to {
-        transform: scale(0);
-        opacity: 0;
-    }
+    from { transform: translate3d(0,0,0) scale(1); opacity: 1; }
+    to   { transform: translate3d(0,0,0) scale(0.96); opacity: 0; }
 }
 
 /* Rotate Animations */
-.rotate-in {
-    animation: rotateIn 0.5s ease-out;
-}
-
+.rotate-in { animation: rotateIn var(--anim-fast) var(--ease-default); will-change: transform, opacity; }
 @keyframes rotateIn {
-    from {
-        transform: rotate(-360deg) scale(0);
-        opacity: 0;
-    }
-    to {
-        transform: rotate(0deg) scale(1);
-        opacity: 1;
-    }
+    from { transform: translate3d(0,0,0) rotate(-240deg) scale(0.8); opacity: 0; }
+    to   { transform: translate3d(0,0,0) rotate(0deg) scale(1); opacity: 1; }
 }
 
 /* Bounce Animation */
-.bounce {
-    animation: bounce 1s ease-in-out infinite;
-}
-
+.bounce { animation: bounce var(--anim-mid) var(--ease-snappy) infinite; will-change: transform; }
 @keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-20px);
-    }
+    0%, 100% { transform: translate3d(0,0,0); }
+    50% { transform: translate3d(0,-16px,0); }
 }
 
-/* Neon Border Animation */
-.neon-border {
-    position: relative;
-    overflow: hidden;
-}
-
+/* Neon Border Animation (reduced oversize) */
+.neon-border { position: relative; overflow: hidden; }
 .neon-border::before {
     content: '';
     position: absolute;
@@ -516,14 +480,11 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: conic-gradient(
-        transparent,
-        var(--primary-blue),
-        transparent 30%
-    );
-    animation: rotateBorder 4s linear infinite;
+    background: conic-gradient(transparent, var(--primary-blue), transparent 30%);
+    animation: rotateBorder 6s linear infinite;
+    will-change: transform;
+    transform: translate3d(0,0,0);
 }
-
 .neon-border::after {
     content: '';
     position: absolute;
@@ -531,25 +492,25 @@
     background: var(--dark-bg);
     border-radius: inherit;
 }
-
 @keyframes rotateBorder {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    from { transform: translate3d(0,0,0) rotate(0deg); }
+    to   { transform: translate3d(0,0,0) rotate(360deg); }
 }
 
-/* Lightning Effect */
+/* Lightning Effect (transform + opacity) */
 .lightning {
     position: absolute;
     width: 2px;
     height: 100%;
     background: linear-gradient(to bottom, transparent, var(--primary-blue), transparent);
-    animation: lightning 0.2s ease-in-out;
+    animation: lightning var(--anim-very-fast) ease-in-out;
     pointer-events: none;
+    will-change: opacity, transform;
+    transform: translate3d(0,0,0);
 }
-
 @keyframes lightning {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
+    0%, 100% { opacity: 0; transform: translate3d(0,0,0) scaleY(0.85); }
+    50%     { opacity: 1; transform: translate3d(0,0,0) scaleY(1); }
 }
 
 /* Energy Wave */
@@ -559,40 +520,26 @@
     height: 100%;
     border: 2px solid var(--primary-blue);
     border-radius: 50%;
-    animation: energyWave 1.5s ease-out forwards;
+    animation: energyWave var(--anim-mid) var(--ease-snappy) forwards;
     pointer-events: none;
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
 }
-
 @keyframes energyWave {
-    0% {
-        transform: scale(0);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(2);
-        opacity: 0;
-    }
+    0% { transform: translate3d(0,0,0) scale(0.2); opacity: 1; }
+    100% { transform: translate3d(0,0,0) scale(2.0); opacity: 0; }
 }
 
-/* Glitch Effect */
-.glitch {
-    animation: glitch 0.3s ease-in-out;
-}
-
+/* Glitch Effect (short and transform-only jitter) */
+.glitch { animation: glitch var(--anim-very-fast) steps(3, end); will-change: transform; }
 @keyframes glitch {
-    0%, 100% {
-        transform: translate(0);
-    }
-    20% {
-        transform: translate(-2px, 2px);
-    }
-    40% {
-        transform: translate(-2px, -2px);
-    }
-    60% {
-        transform: translate(2px, 2px);
-    }
-    80% {
-        transform: translate(2px, -2px);
-    }
+    0% { transform: translate3d(0,0,0); }
+    20% { transform: translate3d(-2px, 2px, 0); }
+    40% { transform: translate3d(-2px, -2px, 0); }
+    60% { transform: translate3d(2px, 2px, 0); }
+    80% { transform: translate3d(2px, -2px, 0); }
+    100% { transform: translate3d(0,0,0); }
 }
+
+/* small convenience class for elements that should be GPU-accelerated */
+.gpu-accelerate { transform: translate3d(0,0,0); will-change: transform, opacity; }
